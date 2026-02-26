@@ -45,14 +45,17 @@ jobs:
       # 8️⃣ Restore Keystore
       - name: Restore keystore
         run: |
-          ls -lh android/app/my-release-key.keystore
-          keytool -list -keystore android/app/my-release-key.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }}
           mkdir -p android/app
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/my-release-key.keystore
           echo "MYAPP_UPLOAD_STORE_FILE=my-release-key.keystore" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}" >> android/gradle.properties
           echo "MYAPP_UPLOAD_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> android/gradle.properties
+      
+      - name: Verify keystore
+        run: |
+          ls -lh android/app/my-release-key.keystore
+          keytool -list -keystore android/app/my-release-key.keystore -storepass ${{ secrets.KEYSTORE_PASSWORD }}
 
       # 9️⃣ Bundle JS
       - name: Bundle JS
@@ -69,4 +72,3 @@ jobs:
       - name: Build Release APK
         working-directory: android
         run: ./gradlew assembleRelease
-        
